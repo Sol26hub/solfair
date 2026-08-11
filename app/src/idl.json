@@ -1,0 +1,476 @@
+{
+  "address": "FkGLxdYpJpmSn2tXVGRyeoQCSb1Nrh2NpzDfWyRwDwXt",
+  "metadata": {
+    "name": "solana_lottery",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Stage-1 SOL-only on-chain lottery using a SlotHashes commit-reveal draw"
+  },
+  "instructions": [
+    {
+      "name": "initialize_lottery",
+      "discriminator": [
+        113,
+        199,
+        243,
+        247,
+        73,
+        217,
+        33,
+        11
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "lottery",
+          "writable": true
+        },
+        {
+          "name": "escrow"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "lottery_id",
+          "type": "u64"
+        },
+        {
+          "name": "ticket_price",
+          "type": "u64"
+        },
+        {
+          "name": "max_tickets",
+          "type": "u32"
+        },
+        {
+          "name": "duration_seconds",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "buy_ticket",
+      "discriminator": [
+        11,
+        24,
+        17,
+        193,
+        168,
+        116,
+        164,
+        169
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "lottery",
+          "writable": true
+        },
+        {
+          "name": "escrow",
+          "writable": true
+        },
+        {
+          "name": "ticket",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "request_randomness",
+      "discriminator": [
+        213,
+        5,
+        173,
+        166,
+        37,
+        236,
+        31,
+        18
+      ],
+      "accounts": [
+        {
+          "name": "caller",
+          "signer": true
+        },
+        {
+          "name": "lottery",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "draw_winner",
+      "discriminator": [
+        250,
+        103,
+        118,
+        147,
+        219,
+        235,
+        169,
+        220
+      ],
+      "accounts": [
+        {
+          "name": "lottery",
+          "writable": true
+        },
+        {
+          "name": "escrow",
+          "writable": true
+        },
+        {
+          "name": "winner",
+          "writable": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "slot_hashes",
+          "address": "SysvarS1otHashes111111111111111111111111111"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "cancel_lottery",
+      "discriminator": [
+        85,
+        35,
+        29,
+        73,
+        218,
+        192,
+        9,
+        166
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "lottery",
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_refund",
+      "discriminator": [
+        15,
+        16,
+        30,
+        161,
+        255,
+        228,
+        97,
+        60
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "lottery"
+        },
+        {
+          "name": "escrow",
+          "writable": true
+        },
+        {
+          "name": "ticket",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Lottery",
+      "discriminator": [
+        162,
+        182,
+        26,
+        12,
+        164,
+        214,
+        112,
+        3
+      ]
+    },
+    {
+      "name": "Ticket",
+      "discriminator": [
+        41,
+        228,
+        24,
+        165,
+        78,
+        90,
+        235,
+        200
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "Lottery",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "lottery_id",
+            "type": "u64"
+          },
+          {
+            "name": "ticket_price",
+            "type": "u64"
+          },
+          {
+            "name": "max_tickets",
+            "type": "u32"
+          },
+          {
+            "name": "tickets_sold",
+            "type": "u32"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "LotteryStatus"
+              }
+            }
+          },
+          {
+            "name": "randomness_target_slot",
+            "type": "u64"
+          },
+          {
+            "name": "winner",
+            "type": {
+              "option": "pubkey"
+            }
+          },
+          {
+            "name": "winning_ticket_index",
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "end_time",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "escrow_bump",
+            "type": "u8"
+          },
+          {
+            "name": "ticket_buyers",
+            "type": {
+              "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Ticket",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "lottery",
+            "type": "pubkey"
+          },
+          {
+            "name": "buyer",
+            "type": "pubkey"
+          },
+          {
+            "name": "ticket_index",
+            "type": "u32"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LotteryStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Open"
+          },
+          {
+            "name": "RandomnessRequested"
+          },
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Cancelled"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidTicketPrice",
+      "msg": "Ticket price must be greater than zero"
+    },
+    {
+      "code": 6001,
+      "name": "InvalidMaxTickets",
+      "msg": "Max tickets must be greater than one"
+    },
+    {
+      "code": 6002,
+      "name": "InvalidDuration",
+      "msg": "Duration must be greater than zero"
+    },
+    {
+      "code": 6003,
+      "name": "LotteryNotOpen",
+      "msg": "Lottery is not open for ticket purchases"
+    },
+    {
+      "code": 6004,
+      "name": "LotteryEnded",
+      "msg": "Lottery has already ended"
+    },
+    {
+      "code": 6005,
+      "name": "LotterySoldOut",
+      "msg": "Lottery is sold out"
+    },
+    {
+      "code": 6006,
+      "name": "LotteryNotReadyForDraw",
+      "msg": "Lottery is not yet ready to draw a winner"
+    },
+    {
+      "code": 6007,
+      "name": "NoTicketsSold",
+      "msg": "No tickets were sold for this lottery"
+    },
+    {
+      "code": 6008,
+      "name": "RandomnessNotRequested",
+      "msg": "Randomness has not been requested for this lottery"
+    },
+    {
+      "code": 6009,
+      "name": "DrawWindowNotOpenYet",
+      "msg": "The committed slot has not been reached yet"
+    },
+    {
+      "code": 6010,
+      "name": "SlotHashesUnreadable",
+      "msg": "Could not read the SlotHashes sysvar"
+    },
+    {
+      "code": 6011,
+      "name": "SlotHashExpired",
+      "msg": "The committed slot's hash has expired from the SlotHashes sysvar; call request_randomness again"
+    },
+    {
+      "code": 6012,
+      "name": "LotteryNotCompleted",
+      "msg": "Lottery has not completed its draw yet"
+    },
+    {
+      "code": 6013,
+      "name": "NoWinnerSelected",
+      "msg": "No winner has been selected yet"
+    },
+    {
+      "code": 6014,
+      "name": "NotWinningTicket",
+      "msg": "This ticket did not win"
+    },
+    {
+      "code": 6015,
+      "name": "NotTicketOwner",
+      "msg": "Signer does not own this ticket"
+    },
+    {
+      "code": 6016,
+      "name": "LotteryNotCancelled",
+      "msg": "Lottery has not been cancelled"
+    },
+    {
+      "code": 6017,
+      "name": "CannotCancelAfterDrawStarted",
+      "msg": "Lottery cannot be cancelled after the draw has started"
+    },
+    {
+      "code": 6018,
+      "name": "Unauthorized",
+      "msg": "Only the lottery authority may perform this action"
+    },
+    {
+      "code": 6019,
+      "name": "InsufficientEscrowBalance",
+      "msg": "Escrow balance is insufficient for this transfer"
+    },
+    {
+      "code": 6020,
+      "name": "MathOverflow",
+      "msg": "Math overflow"
+    }
+  ]
+}

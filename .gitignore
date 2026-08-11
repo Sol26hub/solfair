@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+app/node_modules/
+
+# Build artifacts
+target/
+app/dist/
+.anchor/
+
+# Test ledger (local validator data)
+test-ledger/
+
+# Logs
+*.log
+
+# Sensitive files - NEVER commit these
+*.keypair.json
+id.json
+mainnet-authority.json
+treasury.json
+wallet*.json
+*-keypair.json
+
+# Runtime flags
+MAINTENANCE_MODE
+
+# OS/editor files
+.DS_Store
+.vscode/
+fitai-app/
