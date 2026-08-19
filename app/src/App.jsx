@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { useLottery, LotteryStatus } from "./useLottery.js";
+import PixelMascot from "./PixelMascot.jsx";
 import lotteryConfig from "./config.json";
 
 const TREASURY_PLACEHOLDER = "3ghWMV6hFm1mPrWXnxPriaVunRvqvjG6xVtw4PquLqWL";
@@ -96,6 +97,17 @@ export default function App() {
     ((countdown && countdown.diff === 0) || ticketsSold === maxTickets) &&
     ticketsSold > 0;
 
+  const mascotPose =
+    status === LotteryStatus.RandomnessRequested || (status === LotteryStatus.Open && drawReady)
+      ? "walk"
+      : status === LotteryStatus.Completed
+      ? isWinner
+        ? "win"
+        : myTicket
+        ? "lose"
+        : "idle"
+      : "idle";
+
   async function handle(action, successMsg) {
     setActionMsg(null);
     try {
@@ -129,6 +141,8 @@ export default function App() {
             influence which ticket wins.
           </p>
         </section>
+
+        <PixelMascot pose={mascotPose} />
 
         {loading && <p className="hint">Loading lottery state…</p>}
         {error && <p className="error">{error}</p>}
