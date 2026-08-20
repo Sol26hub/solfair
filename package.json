@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "deploy:init": "ts-node scripts/deploy.ts",
-    "test": "ts-mocha -p ./tsconfig.json -t 1000000 scripts/lottery.test.ts"
+    "test": "ts-mocha -p ./tsconfig.json -t 1000000 scripts/lottery.test.ts",
+    "auto-lottery": "ANCHOR_PROVIDER_URL=http://127.0.0.1:8899 ANCHOR_WALLET=~/.config/solana/id.json ts-node scripts/auto-lottery.ts"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.1",
