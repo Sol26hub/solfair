@@ -28,3 +28,4 @@ MAINTENANCE_MODE
 .DS_Store
 .vscode/
 fitai-app/
+app/public/

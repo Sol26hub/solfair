@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "mkdir -p public && cp src/config.json public/config.json && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

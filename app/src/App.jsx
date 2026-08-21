@@ -27,6 +27,35 @@ function useCountdown(endTimeSeconds) {
   return { diff, label: `${h}h ${m}m ${s}s` };
 }
 
+/**
+ * The bundle bakes in the current round's lottery/escrow addresses at build
+ * time, so an already-open tab keeps polling a dead account once a new round
+ * goes live. This watches a plain static file (not part of the JS bundle,
+ * always served fresh) and reloads the page the moment the round changes.
+ */
+function useNewRoundWatcher(currentLotteryId) {
+  useEffect(() => {
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const res = await fetch(`/config.json?t=${Date.now()}`, { cache: "no-store" });
+        if (!res.ok || cancelled) return;
+        const latest = await res.json();
+        if (latest.lotteryId && latest.lotteryId !== currentLotteryId) {
+          window.location.reload();
+        }
+      } catch {
+        // Network hiccup — just try again on the next tick.
+      }
+    };
+    const id = setInterval(check, 10000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, [currentLotteryId]);
+}
+
 function StatusBadge({ status }) {
   const labels = {
     [LotteryStatus.Open]: "Open",
@@ -51,6 +80,8 @@ function TicketReel({ maxTickets, ticketsSold }) {
 }
 
 export default function App() {
+  useNewRoundWatcher(lotteryConfig.lotteryId);
+
   if (lotteryConfig.maintenance) {
     return (
       <div className="page">

@@ -49,8 +49,9 @@ export function useLottery() {
     )[0];
   }, []);
 
-  const refresh = useCallback(async () => {
-    setLoading(true);
+  const refresh = useCallback(async (opts = {}) => {
+    const { silent = false } = opts;
+    if (!silent) setLoading(true);
     setError(null);
     try {
       // Falls back to a read-only fetch even before a wallet connects, so
@@ -91,7 +92,7 @@ export function useLottery() {
 
   useEffect(() => {
     refresh();
-    const interval = setInterval(refresh, 8000);
+    const interval = setInterval(() => refresh({ silent: true }), 8000);
     return () => clearInterval(interval);
   }, [refresh]);
 
